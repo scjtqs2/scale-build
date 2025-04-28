@@ -360,7 +360,6 @@ sources:
     - "make defconfig"
     - "./scripts/kconfig/merge_config.sh .config scripts/package/truenas/debian_amd64.config"
     - "./scripts/kconfig/merge_config.sh .config scripts/package/truenas/truenas.config"
-    - "./scripts/kconfig/merge_config.sh .config scripts/package/truenas/binder_linux.config"
     - "./scripts/kconfig/merge_config.sh .config scripts/package/truenas/tn-production.config"
     - "make syncconfig"
     - "make archprepare"
