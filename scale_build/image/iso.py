@@ -46,19 +46,6 @@ def install_iso_packages_impl():
         f.write(grub_cfg)
 
 
-def install_customise():
-    # 安装 google coral驱动
-    url = "https://wx.scjtqs.com/downloads/coral/gasket-dkms_1.0-18_all.deb"
-    filename = "gasket-dkms_1.0-18_all.deb"
-    run_in_chroot(
-        ["wget", "-c", "-O", f"./{filename}", f"{url}", "&&", 'apt', 'install', '-V', '-y', f"./{filename}", "&&", "rm",
-         f"./{filename}"])
-    # 更新intel的gpu固件
-    run_in_chroot(["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1", "&&", "cp", "-f",
-                   "intel-gpu-firmware/firmware/*.bin", "/lib/firmware/i915/", "&&",
-                   "rm", "-rf", "intel-gpu-firmware"])
-
-
 def make_iso_file():
     if not PRESERVE_ISO:
         for f in glob.glob(os.path.join(RELEASE_DIR, '*.iso*')):
