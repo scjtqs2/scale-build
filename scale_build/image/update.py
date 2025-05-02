@@ -140,11 +140,11 @@ def install_customise():
     run_in_chroot(['apt', 'install', '-V', '-y', f"{filename}"])
     run_in_chroot(["rm", f"{filename}"])
     # 更新intel的gpu固件
-    run_in_chroot(["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1"
+    run_in_chroot(["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1","/tmp/intel-gpu-firmware"
                    ])
     run_in_chroot(["cp", "-f",
-                   "intel-gpu-firmware/firmware/*.bin", "/lib/firmware/i915/"])
-    run_in_chroot(["rm", "-rf", "intel-gpu-firmware"])
+                   "/tmp/intel-gpu-firmware/firmware/*.bin", "/lib/firmware/i915/"])
+    run_in_chroot(["rm", "-rf", "/tmp/intel-gpu-firmware"])
     # 安装蓝牙相关驱动
     run_in_chroot(['apt', 'install', '-V', '-y', 'bluez', 'bluez-tools', 'pulseaudio-module-bluetooth'])
 
