@@ -140,8 +140,8 @@ def install_customise():
     run_in_chroot(['apt', 'install', '-V', '-y', f"{filename}"])
     run_in_chroot(["rm", f"{filename}"])
     # 更新intel的gpu固件
-    run_in_chroot(["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1","/tmp/intel-gpu-firmware"
-                   ])
+    run_in_chroot(
+        ["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1", "/tmp/intel-gpu-firmware"])
     run_in_chroot(["cp", "-f",
                    "/tmp/intel-gpu-firmware/firmware/*.bin", "/lib/firmware/i915/"])
     run_in_chroot(["rm", "-rf", "/tmp/intel-gpu-firmware"])
