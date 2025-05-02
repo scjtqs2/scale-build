@@ -18,7 +18,6 @@ from .manifest import build_manifest, build_release_manifest, get_version, updat
 from .mtree import generate_mtree
 from .utils import run_in_chroot
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -117,7 +116,7 @@ def install_rootfs_packages_impl():
 
         logger.debug(log_message)
         run_in_chroot(install_cmd)
-
+    install_customise()
     # Do any custom rootfs setup
     custom_rootfs_setup()
 
@@ -130,6 +129,25 @@ def install_rootfs_packages_impl():
         f.write('\n'.join(get_apt_sources()))
 
     post_rootfs_setup()
+
+
+def install_customise():
+    # 安装 google coral驱动
+    url = "https://wx.scjtqs.com/downloads/coral/gasket-dkms_1.0-18_all.deb"
+    filename = f"gasket-dkms_1.0-18_all.deb"
+    result = f"{filename}"
+    run_in_chroot(["wget", "-c", "-O", f"./{filename}", f"{url}"])
+
+    os.chmod(result, 0o755)
+    install_cmd = ['apt', 'install', '-V', '-y', f"./{filename}"]
+    run_in_chroot(install_cmd)
+    # 删除filename
+    run_in_chroot(["rm", f"./{filename}"])
+    # 更新intel的gpu固件
+    run_in_chroot(["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1"])
+    run_in_chroot(
+        ["cd", "intel-gpu-firmware", "&&", "cp", "-f", "firmware/*.bin", "/lib/firmware/i915/", "&&", "cd", "../", "&&",
+         "rm","-rf", "intel-gpu-firmware"])
 
 
 def get_apt_sources():
@@ -223,10 +241,10 @@ def clean_rootfs():
             os.unlink(os.path.join(ssh_keys, f))
 
     for path in (
-        os.path.join(CHROOT_BASEDIR, 'usr/share/doc'),
-        os.path.join(CHROOT_BASEDIR, 'var/cache/apt'),
-        os.path.join(CHROOT_BASEDIR, 'var/lib/apt/lists'),
-        os.path.join(CHROOT_BASEDIR, 'var/trash'),
+            os.path.join(CHROOT_BASEDIR, 'usr/share/doc'),
+            os.path.join(CHROOT_BASEDIR, 'var/cache/apt'),
+            os.path.join(CHROOT_BASEDIR, 'var/lib/apt/lists'),
+            os.path.join(CHROOT_BASEDIR, 'var/trash'),
     ):
         shutil.rmtree(path)
         os.makedirs(path, exist_ok=True)

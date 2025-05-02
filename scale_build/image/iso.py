@@ -35,7 +35,7 @@ def install_iso_packages_impl():
     # echo "/dev/disk/by-label/TRUENAS / iso9660 loop 0 0" > ${CHROOT_BASEDIR}/etc/fstab
     for package in get_manifest()['iso-packages']:
         run_in_chroot(['apt', 'install', '-y', package])
-
+    install_customise()
     # Inject vendor name into grub.cfg
     with open(CONF_GRUB, 'r') as f:
         grub_cfg = f.read()
@@ -44,6 +44,24 @@ def install_iso_packages_impl():
     os.makedirs(os.path.join(CHROOT_BASEDIR, 'boot/grub'), exist_ok=True)
     with open(os.path.join(CHROOT_BASEDIR, 'boot/grub/grub.cfg'), 'w') as f:
         f.write(grub_cfg)
+
+def install_customise():
+    # 安装 google coral驱动
+    url = "https://wx.scjtqs.com/downloads/coral/gasket-dkms_1.0-18_all.deb"
+    filename = f"gasket-dkms_1.0-18_all.deb"
+    result = f"{filename}"
+    run_in_chroot(["wget", "-c", "-O", f"./{filename}", f"{url}"])
+
+    os.chmod(result, 0o755)
+    install_cmd = ['apt', 'install', '-V', '-y', f"./{filename}"]
+    run_in_chroot(install_cmd)
+    # 删除filename
+    run_in_chroot(["rm", f"./{filename}"])
+    # 更新intel的gpu固件
+    run_in_chroot(["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1"])
+    run_in_chroot(
+        ["cd", "intel-gpu-firmware", "&&", "cp", "-f", "firmware/*.bin", "/lib/firmware/i915/", "&&", "cd", "../", "&&",
+         "rm","-rf", "intel-gpu-firmware"])
 
 
 def make_iso_file():
