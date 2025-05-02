@@ -35,7 +35,7 @@ def install_iso_packages_impl():
     # echo "/dev/disk/by-label/TRUENAS / iso9660 loop 0 0" > ${CHROOT_BASEDIR}/etc/fstab
     for package in get_manifest()['iso-packages']:
         run_in_chroot(['apt', 'install', '-y', package])
-    install_customise()
+    # install_customise()
     # Inject vendor name into grub.cfg
     with open(CONF_GRUB, 'r') as f:
         grub_cfg = f.read()
@@ -49,7 +49,7 @@ def install_iso_packages_impl():
 def install_customise():
     # 安装 google coral驱动
     url = "https://wx.scjtqs.com/downloads/coral/gasket-dkms_1.0-18_all.deb"
-    filename = f"gasket-dkms_1.0-18_all.deb"
+    filename = "gasket-dkms_1.0-18_all.deb"
     run_in_chroot(
         ["wget", "-c", "-O", f"./{filename}", f"{url}", "&&", 'apt', 'install', '-V', '-y', f"./{filename}", "&&", "rm",
          f"./{filename}"])
