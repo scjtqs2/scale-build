@@ -45,23 +45,18 @@ def install_iso_packages_impl():
     with open(os.path.join(CHROOT_BASEDIR, 'boot/grub/grub.cfg'), 'w') as f:
         f.write(grub_cfg)
 
+
 def install_customise():
     # 安装 google coral驱动
     url = "https://wx.scjtqs.com/downloads/coral/gasket-dkms_1.0-18_all.deb"
     filename = f"gasket-dkms_1.0-18_all.deb"
-    result = f"{filename}"
-    run_in_chroot(["wget", "-c", "-O", f"./{filename}", f"{url}"])
-
-    os.chmod(result, 0o755)
-    install_cmd = ['apt', 'install', '-V', '-y', f"./{filename}"]
-    run_in_chroot(install_cmd)
-    # 删除filename
-    run_in_chroot(["rm", f"./{filename}"])
-    # 更新intel的gpu固件
-    run_in_chroot(["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1"])
     run_in_chroot(
-        ["cd", "intel-gpu-firmware", "&&", "cp", "-f", "firmware/*.bin", "/lib/firmware/i915/", "&&", "cd", "../", "&&",
-         "rm","-rf", "intel-gpu-firmware"])
+        ["wget", "-c", "-O", f"./{filename}", f"{url}", "&&", 'apt', 'install', '-V', '-y', f"./{filename}", "&&", "rm",
+         f"./{filename}"])
+    # 更新intel的gpu固件
+    run_in_chroot(["git", "clone", "https://github.com/intel-gpu/intel-gpu-firmware.git", "--depth=1", "&&", "cp", "-f",
+                   "intel-gpu-firmware/firmware/*.bin", "/lib/firmware/i915/", "&&",
+                   "rm", "-rf", "intel-gpu-firmware"])
 
 
 def make_iso_file():
@@ -113,8 +108,8 @@ def make_iso_file():
     shutil.copy(os.path.join(CHROOT_BASEDIR, 'initrd.img'), CD_DIR)
     shutil.copy(os.path.join(CHROOT_BASEDIR, 'vmlinuz'), CD_DIR)
     for f in itertools.chain(
-        glob.glob(os.path.join(CD_DIR, 'boot/initrd.img-*')),
-        glob.glob(os.path.join(CD_DIR, 'boot/vmlinuz-*')),
+            glob.glob(os.path.join(CD_DIR, 'boot/initrd.img-*')),
+            glob.glob(os.path.join(CD_DIR, 'boot/vmlinuz-*')),
     ):
         os.unlink(f)
 
