@@ -21,7 +21,7 @@ cdrom:x:24:
 floppy:x:25:
 tape:x:26:
 sudo:x:27:
-audio:x:29:
+audio:x:29:pulse
 dip:x:30:
 www-data:x:33:
 backup:x:34:
@@ -88,3 +88,7 @@ netdata:x:997:
 sssd:x:122:
 incus:x:996:
 incus-admin:x:995:
+bluetooth:x:125:
+pulse:x:128:
+pulse-access:x:139:
+rtkit:x:140:
